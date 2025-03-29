@@ -1,4 +1,4 @@
-- ![Website Preview](screencapture-summarizedpdf-ai-7jcafhn4tsrjtkltln26fb-streamlit-app-2025-03-29-15_31_03.png)
+- ![Website Preview](summarizedtext-ai-.png)
 
 ## Live Demo
-👉 [Try it here](https://summarizedpdf-ai-7jcafhn4tsrjtkltln26fb.streamlit.app/)
+👉 [Try it here](https://summarizedtext-ai-ghwemcsu4jzguxddntwg7y.streamlit.app/)
