@@ -9,61 +9,52 @@ load_dotenv()
 # Fetch the API key from the environment variable
 api_key = os.getenv("GROQ_API_KEY")
 
+if not api_key:
+    st.error("⚠️ API key is missing! Please set GROQ_API_KEY in your .env file.")
+    st.stop()
+
 # Initialize the Groq model
 llm = Groq(model="llama3-70b-8192", api_key=api_key)
 
 def summarize_text(text, summary_type):
-    if summary_type == "Normal Summary":
-        prompt = f"Summarize the text: {text}"
-    elif summary_type == "Short Summary":
-        prompt = f"Summarize the text in 10 words: {text}"
-    elif summary_type == "Simple Summary":
-        prompt = f"Summarize the text in layman terms: {text}"
-    elif summary_type == "Bullet Point Summary":
-        prompt = f"Summarize the text in 3 bullet points: {text}"
+    prompts = {
+        "Normal Summary": f"Summarize the following text:\n{text}",
+        "Short Summary": f"Summarize the following text in 10 words:\n{text}",
+        "Simple Summary": f"Summarize the following text in layman terms:\n{text}",
+        "Bullet Point Summary": f"Summarize the following text in 3 bullet points:\n{text}",
+    }
 
-    response = llm.complete(prompt)
-    return response
+    prompt = prompts.get(summary_type, f"Summarize the text:\n{text}")
+
+    # Use llm.predict() instead of the incorrect complete()
+    try:
+        response = llm.predict(prompt)
+        return response
+    except Exception as e:
+        return f"⚠️ Error generating summary: {str(e)}"
 
 # Streamlit app
-st.title("📄 Text Summarizer 🤖")
+st.title("📄 AI-Powered Text Summarizer 🤖")
 
 # Text input area
-text = st.text_area("Enter a large text paragraph")
+text = st.text_area("Enter a large text paragraph", height=200)
 
-# Buttons for different summaries
-if st.button("Normal Summary 💡"):
-    if text:
-        summary = summarize_text(text, "Normal Summary")
-        st.write("### Normal Summary 💡")
-        st.write(summary)
+# Summary Type Selection
+summary_type = st.selectbox(
+    "Select Summary Type",
+    ("Normal Summary", "Short Summary", "Simple Summary", "Bullet Point Summary")
+)
+
+# Button to generate summary
+if st.button("Generate Summary"):
+    if text.strip():
+        with st.spinner("Generating summary... ⏳"):
+            summary = summarize_text(text, summary_type)
+            st.subheader(f"📜 {summary_type}")
+            st.write(summary)
     else:
-        st.write("Please enter some text to summarize.")
+        st.warning("⚠️ Please enter some text to summarize.")
 
-if st.button("Short Summary 💬"):
-    if text:
-        summary = summarize_text(text, "Short Summary")
-        st.write("### Short Summary 💬")
-        st.write(summary)
-    else:
-        st.write("Please enter some text to summarize.")
-
-if st.button("Simple Summary 🔖"):
-    if text:
-        summary = summarize_text(text, "Simple Summary")
-        st.write("### Simple Summary 🔖")
-        st.write(summary)
-    else:
-        st.write("Please enter some text to summarize.")
-
-if st.button("Bullet Point Summary 🎯"):
-    if text:
-        summary = summarize_text(text, "Bullet Point Summary")
-        st.write("### Bullet Point Summary 🎯")
-        st.write(summary)
-    else:
-        st.write("Please enter some text to summarize.")
-
-# Add a footer
+# Footer
 st.markdown("---")
-st.markdown("Made by Sakshi Ambavade")
+st.markdown("🚀 Made by **Sakshi Ambavade**")
